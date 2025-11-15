@@ -33,6 +33,7 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
+    "@types/socket.io": "^3.0.2",
     "axios": "^1.13.2",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
@@ -43,6 +44,7 @@
     "mongoose": "^8.19.2",
     "morgan": "^1.10.1",
     "reflect-metadata": "^0.2.2",
+    "socket.io": "^4.8.1",
     "tsyringe": "^4.10.0"
   }
 }
