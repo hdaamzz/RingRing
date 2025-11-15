@@ -2,10 +2,11 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { AuthService } from '../../core/services/auth/auth.service';
 import { ProfileService } from '../../core/services/profile/profile.service';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-profile',
-  imports: [CommonModule],
+  imports: [CommonModule,RouterLink],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.css'
 })
@@ -36,7 +37,6 @@ export class ProfileComponent {
       next: (response) => {
         this.ringNumber.set(response.ringNumber);
         this.isGenerating.set(false);
-        // Update user in auth service
         const user = this.currentUser();
         if (user) {
           this.authService.updateUser({ ...user, ringNumber: response.ringNumber });
