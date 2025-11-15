@@ -1,0 +1,193 @@
+<div class="min-h-screen bg-[#172026] py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-4xl mx-auto">
+        <!-- Header -->
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-bold text-white mb-2">Your Profile</h1>
+            <p class="text-gray-400">Manage your Ring Ring account</p>
+        </div>
+
+        <!-- Profile Card -->
+        <div class="relative backdrop-blur-xl bg-white/10 rounded-3xl border border-white/20 shadow-2xl overflow-hidden">
+            <!-- Animated Background -->
+            <div class="absolute inset-0 overflow-hidden opacity-30">
+                <div class="absolute top-0 right-0 w-96 h-96 bg-[#5FCDD9] rounded-full mix-blend-screen filter blur-3xl animate-float"></div>
+                <div class="absolute bottom-0 left-0 w-96 h-96 bg-[#04BF9D] rounded-full mix-blend-screen filter blur-3xl animate-float-delayed"></div>
+            </div>
+
+            <!-- Content -->
+            <div class="relative p-8 md:p-12">
+                <!-- Profile Header -->
+                <div class="flex flex-col md:flex-row items-center gap-8 mb-12">
+                    <!-- Profile Picture -->
+                    <div class="relative group">
+                        @if (currentUser()?.picture) {
+                            <img 
+                                [src]="currentUser()!.picture" 
+                                [alt]="currentUser()!.name"
+                                class="w-32 h-32 rounded-full ring-4 ring-[#5FCDD9]/50 object-cover group-hover:ring-[#5FCDD9] transition-all duration-300"
+                            />
+                        } @else {
+                            <div class="w-32 h-32 rounded-full bg-gradient-to-br from-[#5FCDD9] to-[#04BF9D] flex items-center justify-center ring-4 ring-[#5FCDD9]/50 group-hover:ring-[#5FCDD9] transition-all duration-300">
+                                <span class="text-5xl font-bold text-white">
+                                    {{ currentUser()!.name[0].toUpperCase() }}
+                                </span>
+                            </div>
+                        }
+                        
+                        <!-- Online Status Badge -->
+                        <div class="absolute bottom-2 right-2 w-6 h-6 bg-green-500 rounded-full ring-4 ring-[#172026]"></div>
+                    </div>
+
+                    <!-- User Info -->
+                    <div class="flex-1 text-center md:text-left">
+                        <h2 class="text-3xl font-bold text-white mb-2">{{ currentUser()?.name }}</h2>
+                        <p class="text-gray-400 text-lg mb-4">{{ currentUser()?.email }}</p>
+                        
+                        <!-- Verified Badge -->
+                        <div class="inline-flex items-center gap-2 px-4 py-2 bg-[#04BF9D]/20 rounded-full border border-[#04BF9D]/40">
+                            <svg class="w-5 h-5 text-[#04BF9D]" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="text-[#04BF9D] font-medium text-sm">Verified Account</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ring Number Section -->
+                <div class="mb-12">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-[#5FCDD9]/30 to-[#04BF9D]/30 flex items-center justify-center border border-[#5FCDD9]/40">
+                            <svg class="w-6 h-6 text-[#5FCDD9]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-white">Ring Number</h3>
+                            <p class="text-gray-400 text-sm">Your unique identifier for video calls</p>
+                        </div>
+                    </div>
+
+                    @if (ringNumber()) {
+                        <!-- Display Ring Number -->
+                        <div class="relative group">
+                            <div class="p-6 bg-gradient-to-br from-white/10 to-white/5 rounded-2xl border border-white/20 backdrop-blur-sm hover:border-[#5FCDD9]/50 transition-all duration-300">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex-1">
+                                        <p class="text-gray-400 text-sm mb-2">Your Ring Number</p>
+                                        <p class="text-4xl font-bold bg-gradient-to-r from-[#5FCDD9] to-[#04BF9D] bg-clip-text text-transparent tracking-wider">
+                                            {{ ringNumber() }}
+                                        </p>
+                                    </div>
+                                    
+                                    <!-- Copy Button -->
+                                    <button 
+                                        (click)="copyRingNumber()"
+                                        class="group/copy p-4 bg-[#5FCDD9]/10 hover:bg-[#5FCDD9]/20 rounded-xl border border-[#5FCDD9]/30 hover:border-[#5FCDD9]/50 transition-all duration-300">
+                                        <svg class="w-6 h-6 text-[#5FCDD9] group-hover/copy:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                                        </svg>
+                                    </button>
+                                </div>
+
+                                <!-- Copied Message -->
+                                @if (showCopiedMessage()) {
+                                    <div class="mt-4 p-3 bg-[#04BF9D]/20 rounded-lg border border-[#04BF9D]/40 animate-fade-in">
+                                        <p class="text-[#04BF9D] text-sm font-medium flex items-center gap-2">
+                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                            </svg>
+                                            Copied to clipboard!
+                                        </p>
+                                    </div>
+                                }
+                            </div>
+
+                            <!-- Info Box -->
+                            <div class="mt-4 p-4 bg-blue-500/10 rounded-xl border border-blue-500/20">
+                                <p class="text-blue-400 text-sm flex items-start gap-2">
+                                    <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                                    </svg>
+                                    Share this Ring Number with others so they can call you directly
+                                </p>
+                            </div>
+                        </div>
+                    } @else {
+                        <!-- Generate Ring Number Button -->
+                        <div class="text-center p-8 bg-gradient-to-br from-white/5 to-transparent rounded-2xl border border-dashed border-white/20">
+                            <div class="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-[#5FCDD9]/20 to-[#04BF9D]/20 rounded-2xl flex items-center justify-center border border-[#5FCDD9]/30">
+                                <svg class="w-10 h-10 text-[#5FCDD9]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                                </svg>
+                            </div>
+                            
+                            <h4 class="text-xl font-bold text-white mb-3">Get Your Ring Number</h4>
+                            <p class="text-gray-400 mb-6 max-w-md mx-auto">
+                                Generate a unique 8-digit Ring Number that others can use to call you
+                            </p>
+                            
+                            <button 
+                                (click)="generateRingNumber()"
+                                [disabled]="isGenerating()"
+                                class="group relative px-8 py-4 bg-gradient-to-r from-[#5FCDD9] to-[#04BF9D] rounded-xl font-semibold text-white hover:shadow-2xl hover:shadow-[#5FCDD9]/30 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100">
+                                @if (isGenerating()) {
+                                    <span class="flex items-center gap-3">
+                                        <svg class="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                        Generating...
+                                    </span>
+                                } @else {
+                                    <span>Generate Ring Number</span>
+                                }
+                                
+                                <div class="absolute inset-0 rounded-xl bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                            </button>
+                        </div>
+                    }
+                </div>
+
+                <!-- Account Stats -->
+                <div class="grid grid-cols-3 gap-4 mb-8">
+                    <div class="p-4 bg-white/5 rounded-xl border border-white/10 text-center hover:bg-white/10 transition-all duration-300">
+                        <p class="text-3xl font-bold bg-gradient-to-r from-[#5FCDD9] to-[#04BF9D] bg-clip-text text-transparent mb-1">0</p>
+                        <p class="text-gray-400 text-sm">Total Calls</p>
+                    </div>
+                    <div class="p-4 bg-white/5 rounded-xl border border-white/10 text-center hover:bg-white/10 transition-all duration-300">
+                        <p class="text-3xl font-bold bg-gradient-to-r from-[#5FCDD9] to-[#04BF9D] bg-clip-text text-transparent mb-1">0</p>
+                        <p class="text-gray-400 text-sm">Contacts</p>
+                    </div>
+                    <div class="p-4 bg-white/5 rounded-xl border border-white/10 text-center hover:bg-white/10 transition-all duration-300">
+                        <p class="text-3xl font-bold bg-gradient-to-r from-[#5FCDD9] to-[#04BF9D] bg-clip-text text-transparent mb-1">0h</p>
+                        <p class="text-gray-400 text-sm">Call Time</p>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <button class="flex-1 px-6 py-4 bg-white/5 backdrop-blur-sm rounded-xl border border-white/20 font-semibold text-white hover:bg-white/10 hover:border-[#5FCDD9]/50 transition-all duration-300">
+                        <span class="flex items-center justify-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            </svg>
+                            Settings
+                        </span>
+                    </button>
+                    
+                    <button 
+                        (click)="logout()"
+                        class="px-6 py-4 bg-red-500/10 backdrop-blur-sm rounded-xl border border-red-500/30 font-semibold text-red-400 hover:bg-red-500/20 hover:border-red-500/50 transition-all duration-300">
+                        <span class="flex items-center justify-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                            </svg>
+                            Logout
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { injectable, inject } from 'tsyringe';
 import { IAuthService } from '../../services/auth/auth.service.interface.js';
 import { firebaseAuth } from '../../config/firebase.config.js';
+import { IImageService } from '../../services/image/image.service.interface.js';
 
 
 @injectable()
@@ -9,7 +10,8 @@ export class AuthController {
   private readonly authService: IAuthService;
 
   constructor(
-    @inject('IAuthService') authService: IAuthService
+    @inject('IAuthService') authService: IAuthService,
+    @inject('IImageService') private readonly imageService: IImageService
   ) {
     this.authService = authService;
   }
@@ -27,6 +29,18 @@ export class AuthController {
       const { user, token } = await this.authService.googleLogin(decoded);
 
       
+      let cachedPictureUrl = user.picture;
+      if (user.picture && user.picture.includes('googleusercontent.com')) {
+        try {
+          cachedPictureUrl = await this.imageService.cacheProfilePicture(
+            user._id as string,
+            user.picture
+          );
+        } catch (error) {
+          console.error('Failed to cache profile picture:', error);
+        }
+      }
+
       res.cookie('authToken', token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
@@ -34,13 +48,13 @@ export class AuthController {
         maxAge: 60 * 60 * 1000,
       });
 
-      
       res.json({
         message: 'Login successful',
         user: {
           name: user.name,
           email: user.email,
-          picture: user.picture,
+          picture: cachedPictureUrl,
+          ringNumber: user.ringNumber,
         },
         token,
       });

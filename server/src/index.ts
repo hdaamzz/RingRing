@@ -6,9 +6,14 @@ import morgan from 'morgan';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import mongoose from 'mongoose';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import './container.js';
 import router from './routes/routes.js';
 import connectDB from './config/database.connect.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT;
@@ -32,6 +37,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 app.use('/api', router);
 
 app.listen(PORT, () => {
