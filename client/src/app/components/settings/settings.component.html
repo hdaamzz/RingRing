@@ -143,14 +143,15 @@
                                         <p class="text-white font-medium">Sound Notifications</p>
                                         <p class="text-gray-400 text-sm">Play sound for incoming calls</p>
                                     </div>
-                                    <label class="relative inline-flex items-center cursor-pointer">
-                                        <input type="checkbox" [(ngModel)]="settings().notifications.sound"
-                                            (change)="updateSetting('notifications.sound', settings().notifications.sound)"
-                                            class="sr-only peer">
-                                        <div
-                                            class="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-linear-to-r peer-checked:from-[#5FCDD9] peer-checked:to-[#04BF9D]">
-                                        </div>
-                                    </label>
+                                    <div class="flex items-center gap-3">
+                                        <button (click)="testRingtone()" class="px-4 py-2 bg-[#5FCDD9]/20 border border-[#5FCDD9]/30 rounded-lg text-[#5FCDD9] font-medium text-sm hover:bg-[#5FCDD9]/30 transition-all">
+                                            Test Sound
+                                        </button>
+                                        <label class="relative inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" [(ngModel)]="settings().notifications.sound" (change)="updateSetting('notifications.sound', settings().notifications.sound)" class="sr-only peer">
+                                            <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-linear-to-r peer-checked:from-[#5FCDD9] peer-checked:to-[#04BF9D]"></div>
+                                        </label>
+                                    </div>
                                 </div>
 
                                 <div class="flex items-center justify-between p-4 bg-white/5 rounded-xl">

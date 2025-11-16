@@ -98,17 +98,23 @@ export class WebrtcService {
 
   // Initialize local media
   async initializeMedia(videoEnabled: boolean = true): Promise<MediaStream> {
+    const settings = JSON.parse(localStorage.getItem('ringring_settings') || '{}');
+    const selectedCamera = localStorage.getItem('selected_camera');
+    const selectedMicrophone = localStorage.getItem('selected_microphone');
+
     try {
       this.localStream = await navigator.mediaDevices.getUserMedia({
-        video: videoEnabled ? {
+        video: videoEnabled ? { 
+          deviceId: selectedCamera ? { exact: selectedCamera } : undefined,
           width: { ideal: 1280 },
           height: { ideal: 720 },
           facingMode: 'user'
         } : false,
         audio: {
-          echoCancellation: true,
-          noiseSuppression: true,
-          autoGainControl: true,
+          deviceId: selectedMicrophone ? { exact: selectedMicrophone } : undefined,
+          echoCancellation: settings.audio?.echoCancellation ?? true,
+          noiseSuppression: settings.audio?.noiseSuppression ?? true,
+          autoGainControl: settings.audio?.autoGainControl ?? true,
         },
       });
 

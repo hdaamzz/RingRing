@@ -111,7 +111,7 @@
                                         </svg>
                                         Profile
                                     </a>
-                                    <a href="#"
+                                    <a href="/settings"
                                         class="flex items-center gap-3 px-4 py-2 text-gray-300 hover:bg-[#5FCDD9]/10 hover:text-[#5FCDD9] transition-colors">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -164,17 +164,12 @@
 
             <!-- CTA Buttons -->
             <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8">
-                <button
+                <button (click)="toProfile()"
                     class="group relative px-8 py-4 bg-linear-to-r from-[#5FCDD9] to-[#04BF9D] rounded-xl font-semibold text-white hover:shadow-2xl hover:shadow-[#5FCDD9]/30 transition-all duration-300 hover:scale-105 min-w-[200px]">
                     Get Started Free
                     <div
                         class="absolute inset-0 rounded-xl bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                     </div>
-                </button>
-
-                <button
-                    class="group px-8 py-4 bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 font-semibold text-white hover:bg-white/10 hover:border-[#5FCDD9]/50 transition-all duration-300 min-w-[200px]">
-                    Watch Demo
                 </button>
             </div>
 

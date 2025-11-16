@@ -10,7 +10,7 @@
 @keyframes scale-in {
   from {
     opacity: 0;
-    transform: scale(0.9) translateY(20px);
+    transform: scale(0.92) translateY(30px);
   }
   to {
     opacity: 1;
@@ -24,36 +24,77 @@
     opacity: 0.3;
   }
   50% {
-    transform: scale(1.1);
-    opacity: 0.1;
+    transform: scale(1.08);
+    opacity: 0.15;
   }
 }
 
 @keyframes pulse-ring-delayed {
   0%, 100% {
     transform: scale(1);
+    opacity: 0.25;
+  }
+  50% {
+    transform: scale(1.12);
+    opacity: 0.1;
+  }
+}
+
+@keyframes pulse-ring-slow {
+  0%, 100% {
+    transform: scale(1);
     opacity: 0.2;
   }
   50% {
-    transform: scale(1.15);
+    transform: scale(1.18);
     opacity: 0.05;
   }
 }
 
-.animate-fade-in {
-  animation: fade-in 0.3s ease-out;
+@keyframes float {
+  0%, 100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  33% {
+    transform: translate(30px, -30px) rotate(120deg);
+  }
+  66% {
+    transform: translate(-20px, 20px) rotate(240deg);
+  }
 }
 
-.animate-scale-in {
-  animation: scale-in 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+@keyframes float-delayed {
+  0%, 100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  33% {
+    transform: translate(-30px, 30px) rotate(-120deg);
+  }
+  66% {
+    transform: translate(20px, -20px) rotate(-240deg);
+  }
 }
 
-.animate-pulse-ring {
-  animation: pulse-ring 2s ease-in-out infinite;
+@keyframes ping {
+  0% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  75%, 100% {
+    transform: scale(1.4);
+    opacity: 0;
+  }
 }
 
-.animate-pulse-ring-delayed {
-  animation: pulse-ring-delayed 2s ease-in-out infinite 0.3s;
+@keyframes ping-slow {
+  0% {
+    transform: scale(1);
+    opacity: 0.3;
+  }
+  75%, 100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
 }
 
 @keyframes bounce {
@@ -61,10 +102,68 @@
     transform: translateY(0);
   }
   50% {
-    transform: translateY(-10px);
+    transform: translateY(-12px);
   }
 }
 
+@keyframes pulse-slow {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.85;
+    transform: scale(1.03);
+  }
+}
+
+/* Animations */
+.animate-fade-in {
+  animation: fade-in 0.4s ease-out;
+}
+
+.animate-scale-in {
+  animation: scale-in 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.animate-pulse-ring {
+  animation: pulse-ring 2.5s ease-in-out infinite;
+}
+
+.animate-pulse-ring-delayed {
+  animation: pulse-ring-delayed 2.5s ease-in-out infinite 0.4s;
+}
+
+.animate-pulse-ring-slow {
+  animation: pulse-ring-slow 3s ease-in-out infinite 0.8s;
+}
+
+.animate-float {
+  animation: float 20s ease-in-out infinite;
+}
+
+.animate-float-delayed {
+  animation: float-delayed 25s ease-in-out infinite;
+}
+
+.animate-ping {
+  animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+.animate-ping-slow {
+  animation: ping-slow 2.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
 .animate-bounce {
-  animation: bounce 1s ease-in-out infinite;
+  animation: bounce 1.2s ease-in-out infinite;
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 3s ease-in-out infinite;
+}
+
+* {
+  transition-property: transform, opacity, box-shadow;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 200ms;
 }

@@ -4,6 +4,7 @@ import { WebrtcService } from '../../core/services/webrtc/webrtc.service';
 import { AuthService } from '../../core/services/auth/auth.service';
 import { ToastService } from '../../core/services/toast/toast.service';
 import { Router } from '@angular/router';
+import { RingtoneService } from '../../core/services/ringtone/ringtone.service';
 
 @Component({
   selector: 'app-incoming-call',
@@ -15,6 +16,7 @@ export class IncomingCallComponent implements OnInit, OnDestroy{
   private webrtcService = inject(WebrtcService);
   private authService = inject(AuthService);
   private toastService = inject(ToastService);
+  private ringtoneService = inject(RingtoneService); 
   private router = inject(Router);
 
   protected incomingCall = this.webrtcService.currentIncomingCall;
@@ -41,36 +43,17 @@ export class IncomingCallComponent implements OnInit, OnDestroy{
   private startRinging(): void {
     this.isRinging.set(true);
     
-    // Play ringtone (you can add an actual audio file later)
-    // For now, we'll use the browser's notification sound or vibration
-    if ('vibrate' in navigator) {
-      // Vibration pattern: vibrate for 500ms, pause for 500ms, repeat
-      this.ringtoneInterval = setInterval(() => {
-        navigator.vibrate([500, 500]);
-      }, 1000);
-    }
-
-    // Optional: Play custom ringtone
-    // this.ringtoneAudio = new Audio('/assets/sounds/ringtone.mp3');
-    // this.ringtoneAudio.loop = true;
-    // this.ringtoneAudio.play();
+    this.ringtoneService.startRingtone();
+    
+    console.log('📱 Ringing started');
   }
 
   private stopRinging(): void {
     this.isRinging.set(false);
-
-    if (this.ringtoneInterval) {
-      clearInterval(this.ringtoneInterval);
-    }
-
-    if (this.ringtoneAudio) {
-      this.ringtoneAudio.pause();
-      this.ringtoneAudio = null;
-    }
-
-    if ('vibrate' in navigator) {
-      navigator.vibrate(0);
-    }
+    
+    this.ringtoneService.stopRingtone();
+    
+    console.log('📱 Ringing stopped');
   }
 
   async acceptCall(): Promise<void> {

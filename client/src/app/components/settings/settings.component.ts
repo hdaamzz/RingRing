@@ -5,6 +5,7 @@ import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/services/auth/auth.service';
 import { ToastService } from '../../core/services/toast/toast.service';
 import { AppSettings, MediaDevice } from '../../core/interfaces/settings';
+import { RingtoneService } from '../../core/services/ringtone/ringtone.service';
 
 @Component({
   selector: 'app-settings',
@@ -15,6 +16,7 @@ import { AppSettings, MediaDevice } from '../../core/interfaces/settings';
 export class SettingsComponent implements OnInit {
   private authService = inject(AuthService);
   private toastService = inject(ToastService);
+  private ringtoneService = inject(RingtoneService);
   private router = inject(Router);
 
   protected currentUser = this.authService.currentUser;
@@ -64,11 +66,13 @@ export class SettingsComponent implements OnInit {
   }
 
   private loadSettings(): void {
-    // Load from localStorage
     const saved = localStorage.getItem('ringring_settings');
     if (saved) {
       this.settings.set(JSON.parse(saved));
     }
+  }
+  testRingtone(): void {
+    this.ringtoneService.testRingtone();
   }
 
   private saveSettings(): void {
@@ -78,16 +82,11 @@ export class SettingsComponent implements OnInit {
 
   async loadDevices(): Promise<void> {
     try {
-      // ✅ First, try to enumerate without requesting permissions
       let devices = await navigator.mediaDevices.enumerateDevices();
 
-      // Check if we have device labels (requires prior permission)
       const hasLabels = devices.some(d => d.label !== '');
 
-      // ✅ Only request permission if we don't have labels and user is on Devices tab
       if (!hasLabels) {
-        // Don't auto-request on page load
-        // Just show generic device names
         const videoDevices = devices
           .filter(d => d.kind === 'videoinput')
           .map((d, i) => ({
@@ -121,7 +120,6 @@ export class SettingsComponent implements OnInit {
         return;
       }
 
-      // ✅ If we already have permission, use real labels
       const videoDevices = devices
         .filter(d => d.kind === 'videoinput')
         .map(d => ({ deviceId: d.deviceId, label: d.label }));
@@ -154,7 +152,6 @@ export class SettingsComponent implements OnInit {
         video: { deviceId: this.selectedCamera() }
       });
 
-      // Stop the stream immediately (just testing)
       stream.getTracks().forEach(track => track.stop());
 
       this.toastService.success('Camera is working! 📹');
@@ -208,7 +205,6 @@ export class SettingsComponent implements OnInit {
 
   clearCallHistory(): void {
     if (confirm('Are you sure you want to clear your call history? This cannot be undone.')) {
-      // TODO: API call to clear call history
       this.toastService.success('Call history cleared');
     }
   }
