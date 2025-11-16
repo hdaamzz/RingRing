@@ -9,6 +9,6 @@ const router = express.Router();
 router.use('/auth', authRouter);
 router.use('/ring-number', ringNumberRoutes);
 router.use('/contacts', contactRoutes);
-router.use('/api/calls', callRoutes);
+router.use('/calls', callRoutes);
 
 export default router;

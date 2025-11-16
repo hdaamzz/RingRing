@@ -48,12 +48,19 @@ export class CallService implements ICallService {
   }
 
   async getCallHistory(userId: string, page: number = 1, limit: number = 20): Promise<any> {
+    console.log('🔍 Fetching call history for userId:', userId);
+    
     const { calls, total } = await this.callRepo.getCallHistory(userId, page, limit);
+
+    console.log('📞 Found', total, 'calls');
 
     const populatedCalls = await Promise.all(
       calls.map(async (call) => {
         const otherUserId = call.callerId === userId ? call.receiverId : call.callerId;
-        const otherUser = await this.userRepo.findById(otherUserId);
+        
+        const otherUser = await this.userRepo.findByEmail(otherUserId);
+
+        console.log('👤 Contact:', otherUser?.name, otherUser?.email);
 
         return {
           id: call._id,
@@ -64,10 +71,10 @@ export class CallService implements ICallService {
           endTime: call.endTime,
           isIncoming: call.receiverId === userId,
           contact: {
-            id: otherUser?._id,
-            name: otherUser?.name,
+            id: otherUserId, 
+            name: otherUser?.name || 'Unknown User',
             picture: otherUser?.picture,
-            ringNumber: otherUser?.ringNumber,
+            ringNumber: otherUser?.ringNumber || 'N/A',
           },
         };
       })

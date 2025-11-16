@@ -7,8 +7,7 @@ const router = Router();
 const callController = container.resolve(CallController);
 const authMiddleware = container.resolve(AuthMiddleware);
 
-const authenticate = (req: any, res: any, next: any) => authMiddleware.verify(req, res, next);
 
-router.get('/history', authenticate, (req, res) => callController.getCallHistory(req, res));
+router.get('/history',  (req, res, next) => authMiddleware.verify(req, res, next), (req, res) => callController.getCallHistory(req, res));
 
 export default router;

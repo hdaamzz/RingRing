@@ -17,6 +17,7 @@ import { ICallRepository } from './repositories/call.repository.interface.js';
 import { CallRepository } from './repositories/call.repository.js';
 import { CallService } from './services/call/call.service.js';
 import { ICallService } from './services/call/call.service.interface.js';
+import { CallController } from './controllers/call/call.controller.js';
 
 // Register repositories
 container.registerSingleton('IUserRepository', UserRepository);
@@ -33,6 +34,7 @@ container.register<ICallService>('ICallService', { useClass: CallService });
 
 // Register controllers
 container.registerSingleton('AuthController', AuthController);
+container.registerSingleton('CallController',CallController);
 
 // Register middlewares
 container.registerSingleton('AuthMiddleware', AuthMiddleware);
