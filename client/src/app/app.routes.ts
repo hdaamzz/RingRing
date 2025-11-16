@@ -5,6 +5,7 @@ import { authGuard } from './core/guard/auth/auth.guard';
 import { ContactsComponent } from './components/contacts/contacts.component';
 import { CallComponent } from './components/call/call.component';
 import { CallHistoryComponent } from './components/call-history/call-history.component';
+import { SettingsComponent } from './components/settings/settings.component';
 
 export const routes: Routes = [
     {
@@ -29,6 +30,11 @@ export const routes: Routes = [
     { 
       path: 'history', 
       component: CallHistoryComponent,
+      canActivate: [authGuard] 
+    },
+    { 
+      path: 'settings', 
+      component: SettingsComponent,
       canActivate: [authGuard] 
     },
 ];
