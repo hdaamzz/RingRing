@@ -211,17 +211,110 @@
 
                 <!-- Activity Feed -->
                 <div class="backdrop-blur-3xl bg-white/5 rounded-3xl border border-white/10 p-8">
-                    <h3 class="text-lg font-semibold text-white mb-6">Recent Activity</h3>
-                    <div class="text-center py-12">
-                        <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-white/5 flex items-center justify-center">
-                            <svg class="w-8 h-8 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-2xl font-bold text-white">Recent Activity</h2>
+                        <a routerLink="/history" class="text-[#5FCDD9] hover:text-[#04BF9D] font-medium text-sm flex items-center gap-1 transition-colors">
+                            <span>View All</span>
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                             </svg>
-                        </div>
-                        <p class="text-gray-400">No activity yet</p>
-                        <p class="text-gray-500 text-sm mt-1">Your recent calls will appear here</p>
+                        </a>
                     </div>
+
+                    @if (isLoadingActivity()) {
+                        <!-- Loading State -->
+                        <div class="flex items-center justify-center py-12">
+                            <div class="flex flex-col items-center gap-3">
+                                <svg class="animate-spin h-8 w-8 text-[#5FCDD9]" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                <p class="text-gray-400 text-sm">Loading activity...</p>
+                            </div>
+                        </div>
+                    } @else if (recentCalls().length === 0) {
+                        <!-- Empty State -->
+                        <div class="flex flex-col items-center justify-center py-12">
+                            <div class="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center mb-4">
+                                <svg class="w-8 h-8 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                            </div>
+                            <h3 class="text-lg font-semibold text-white mb-1">No activity yet</h3>
+                            <p class="text-gray-400 text-sm mb-4">Your recent calls will appear here</p>
+                            <button (click)="openCallModal()" class="px-4 py-2 bg-linear-to-r from-[#5FCDD9] to-[#04BF9D] rounded-lg text-white font-medium text-sm hover:shadow-lg transition-all">
+                                Make Your First Call
+                            </button>
+                        </div>
+                    } @else {
+                        <!-- Recent Calls List -->
+                        <div class="space-y-3">
+                            @for (call of recentCalls(); track call.id) {
+                                <div class="group flex items-center gap-4 p-4 bg-white/5 hover:bg-white/10 rounded-2xl border border-white/10 hover:border-[#5FCDD9]/30 transition-all cursor-pointer">
+                                    <!-- Contact Avatar -->
+                                    <div class="shrink-0">
+                                        @if (call.contact.picture) {
+                                            <img [src]="call.contact.picture" [alt]="call.contact.name" class="w-12 h-12 rounded-full ring-2 ring-white/10">
+                                        } @else {
+                                            <div class="w-12 h-12 rounded-full bg-linear-to-br from-[#5FCDD9] to-[#04BF9D] flex items-center justify-center ring-2 ring-white/10">
+                                                <span class="text-lg font-bold text-white">{{ call.contact.name[0].toUpperCase() }}</span>
+                                            </div>
+                                        }
+                                    </div>
+
+                                    <!-- Call Info -->
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex items-center gap-2 mb-0.5">
+                                            <h3 class="text-white font-semibold truncate">{{ call.contact.name }}</h3>
+                                            
+                                            <!-- Call Type Icon -->
+                                            @if (call.type === 'video') {
+                                                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                                                </svg>
+                                            }
+                                        </div>
+                                        
+                                        <div class="flex items-center gap-2 text-sm">
+                                            <!-- Call Direction Icon -->
+                                            @if (getCallIcon(call).icon === 'incoming') {
+                                                <svg class="w-4 h-4" [class]="getCallIcon(call).color" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/>
+                                                </svg>
+                                            } @else if (getCallIcon(call).icon === 'outgoing') {
+                                                <svg class="w-4 h-4" [class]="getCallIcon(call).color" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                                                </svg>
+                                            } @else {
+                                                <svg class="w-4 h-4" [class]="getCallIcon(call).color" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                                </svg>
+                                            }
+                                            
+                                            <span class="text-gray-400">{{ formatTime(call.startTime) }}</span>
+                                            
+                                            @if (call.duration > 0) {
+                                                <span class="text-gray-400">•</span>
+                                                <span class="text-[#5FCDD9]">{{ formatDuration(call.duration) }}</span>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+
+                        <!-- View All Link -->
+                        @if (recentCalls().length >= 5) {
+                            <div class="mt-4 text-center">
+                                <a routerLink="/history" class="inline-flex items-center gap-2 px-6 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-white font-medium transition-all">
+                                    <span>View All Call History</span>
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                                    </svg>
+                                </a>
+                            </div>
+                        }
+                    }
                 </div>
             </div>
         </div>
