@@ -1,0 +1,27 @@
+<div class="fixed top-4 right-4 z-9999 space-y-3 max-w-md">
+    @for (toast of toasts(); track toast.id) {
+    <div
+        [class]="'backdrop-blur-xl rounded-2xl border p-4 shadow-2xl animate-slide-in-right flex items-start gap-3 ' + getColors(toast.type).bg + ' ' + getColors(toast.type).border">
+        <!-- Icon -->
+        <div [class]="'shrink-0 ' + getColors(toast.type).icon">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="getIcon(toast.type)" />
+            </svg>
+        </div>
+
+        <!-- Content -->
+        <div class="flex-1 min-w-0">
+            <p [class]="'text-sm font-medium ' + getColors(toast.type).text">
+                {{ toast.message }}
+            </p>
+        </div>
+
+        <!-- Close Button -->
+        <button (click)="removeToast(toast.id)" class="shrink-0 text-gray-400 hover:text-white transition-all">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+    </div>
+    }
+</div>

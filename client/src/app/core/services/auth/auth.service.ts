@@ -65,6 +65,11 @@ export class AuthService {
     return this.tokenSignal();
   }
 
+  updateUser(user: UserProfile): void {
+    this.userSignal.set(user);
+    sessionStorage.setItem('currentUser', JSON.stringify(user));
+  }
+
   async loginWithGoogle() {
     try {
       const result = await signInWithPopup(auth, googleProvider);

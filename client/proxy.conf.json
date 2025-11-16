@@ -3,9 +3,12 @@
     "target": "http://localhost:3000",
     "secure": false,
     "changeOrigin": true,
-    "pathRewrite": {
-      "^/api": "/api"
-    },
+    "logLevel": "debug"
+  },
+  "/uploads": {
+    "target": "http://localhost:3000",
+    "secure": false,
+    "changeOrigin": true,
     "logLevel": "debug"
   }
 }

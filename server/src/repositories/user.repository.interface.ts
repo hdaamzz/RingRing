@@ -7,4 +7,5 @@ export interface IUserRepository {
   create(userData: Partial<IUser>): Promise<IUser>;
   update(id: string, userData: Partial<IUser>): Promise<IUser | null>;
   delete(id: string): Promise<boolean>;
+  findByRingNumber(ringNumber: string): Promise<IUser | null>; 
 }
