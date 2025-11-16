@@ -65,4 +65,13 @@ export class UserRepository implements IUserRepository {
     const result = await UserModel.findByIdAndDelete(id).exec();
     return result !== null;
   }
+
+  async findByRingNumber(ringNumber: string): Promise<IUser | null> {
+    const user = await UserModel.findOne({ ringNumber }).lean<IUser>().exec();
+    if (!user) return null;
+    return {
+      ...user,
+      _id: user._id?.toString()
+    };
+  }
 }

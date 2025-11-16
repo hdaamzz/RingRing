@@ -1,14 +1,6 @@
-import mongoose, { Schema, Document, Model } from 'mongoose';
+import mongoose, { Schema, Model } from 'mongoose';
+import { IUserDocument } from '../interfaces/schema/user.interface';
 
-export interface IUserDocument extends Document {
-  googleId: string;
-  name: string;
-  email: string;
-  picture?: string;
-  emailVerified?: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-}
 
 const userSchema = new Schema<IUserDocument>(
   {
@@ -33,11 +25,22 @@ const userSchema = new Schema<IUserDocument>(
       type: Boolean, 
       default: false 
     },
+    ringNumber: {
+      type: String,
+      unique: true,
+      sparse: true,
+      index: true,
+    },
+    ringNumberAssignedAt: {
+      type: Date,
+    },
   },
   {
     timestamps: true,
   }
 );
+
+userSchema.index({ email: 1, ringNumber: 1 });
 
 const UserModel: Model<IUserDocument> = mongoose.model<IUserDocument>('User', userSchema);
 
