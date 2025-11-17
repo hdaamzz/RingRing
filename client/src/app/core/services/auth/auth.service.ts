@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { signInWithPopup, signOut, onAuthStateChanged } from 'firebase/auth';
 import { auth, googleProvider } from '../../config/firebase.config';
 import { UserProfile, LoginResponse } from '../../interfaces/user';
+import { environment } from '../../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -17,6 +18,7 @@ export class AuthService {
 
   public currentUser = this.userSignal.asReadonly();
   public isAuthenticated = computed(() => this.currentUser() !== null);
+  private api=environment.api_url
 
   constructor() {
     this.loadFromStorage(); 
@@ -77,7 +79,7 @@ export class AuthService {
 
       this.http
         .post<LoginResponse>( 
-          '/api/auth/google',
+          `${this.api}/api/auth/google`,
           { idToken },
           { withCredentials: true }
         )
@@ -99,7 +101,7 @@ export class AuthService {
   logout() {
     signOut(auth).then(() => {
       this.http
-        .post('/api/auth/logout', {}, { withCredentials: true })
+        .post(`${this.api}/api/auth/logout`, {}, { withCredentials: true })
         .subscribe({
           next: () => {
             this.clearUser();
