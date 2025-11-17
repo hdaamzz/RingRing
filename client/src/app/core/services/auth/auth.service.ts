@@ -85,6 +85,9 @@ export class AuthService {
         )
         .subscribe({
           next: (res) => {
+            if (res.user.picture && res.user.picture.startsWith('/uploads')) {
+              res.user.picture = `${environment.api_url}${res.user.picture}`;
+            }
             console.log('Login successful:', res.user,res.token);
             this.setUser(res.user, res.token);
             this.router.navigate(['/']);
