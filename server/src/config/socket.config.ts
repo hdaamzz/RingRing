@@ -20,16 +20,14 @@ interface RTCIceCandidateInit {
 }
 
 
-// Store active users
 const activeUsers = new Map<string, SocketUser>();
 
-// Store active calls with timestamps
 const activeCalls = new Map<string, {
   callerId: string;
   receiverId: string;
   startTime: Date;
   callType: 'video' | 'audio';
-  callDocumentId?: string; // ✅ Store MongoDB document ID
+  callDocumentId?: string; 
 }>();
 
 export const initializeSocket = (httpServer: HttpServer) => {

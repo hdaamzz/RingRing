@@ -1,0 +1,22 @@
+services:
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: ringring-server
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    volumes:
+      - ./server/node_modules:/app/node_modules  
+      - ./server/uploads:/usr/src/app/uploads
+    networks:
+      - ringring-network
+
+
+
+networks:
+  ringring-network:
+    driver: bridge
