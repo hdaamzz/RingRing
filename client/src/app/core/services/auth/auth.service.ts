@@ -80,8 +80,7 @@ export class AuthService {
       this.http
         .post<LoginResponse>( 
           `${this.api}/api/auth/google`,
-          { idToken },
-          { withCredentials: true }
+          { idToken }
         )
         .subscribe({
           next: (res) => {
@@ -104,7 +103,7 @@ export class AuthService {
   logout() {
     signOut(auth).then(() => {
       this.http
-        .post(`${this.api}/api/auth/logout`, {}, { withCredentials: true })
+        .post(`${this.api}/api/auth/logout`, {})
         .subscribe({
           next: () => {
             this.clearUser();

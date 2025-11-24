@@ -14,15 +14,13 @@ private api=environment.api_url
   assignRingNumber(): Observable<RingNumberResponse> {
     return this.http.post<RingNumberResponse>(
       `${this.api}/api/ring-number/assign`,
-      {},
-      { withCredentials: true }
+      {}
     );
   }
 
   findUserByRingNumber(ringNumber: string): Observable<any> {
     return this.http.get(
-      `${this.api}/api/ring-number/user/${ringNumber}`,
-      { withCredentials: true }
+      `${this.api}/api/ring-number/user/${ringNumber}`
     );
   }
 }
