@@ -186,7 +186,6 @@ export class ContactsComponent implements OnInit {
   }
 
   startCall(contact: Contact): void {
-    console.log('Starting call with:', contact);
     this.toastService.info(`Calling ${contact.name}... 📞`);
   }
 

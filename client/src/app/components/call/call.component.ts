@@ -55,8 +55,11 @@ export class CallComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.startStreamCheck();
+  this.startStreamCheck();
+  if (this.localVideo?.nativeElement) {
+    this.localVideo.nativeElement.muted = true;
   }
+}
 
   ngOnDestroy(): void {
     if (this.durationInterval) {
