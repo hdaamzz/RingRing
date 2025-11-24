@@ -242,15 +242,9 @@
         <div class="mb-6">
             <label class="block text-gray-400 text-sm mb-2">Ring Number</label>
             <div class="flex flex-col sm:flex-row gap-2">
-            <input
-                [(ngModel)]="searchQuery"
-                type="text"
-                placeholder="XXXX-XXXX"
-                maxlength="9"
-                class="flex-1 px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 outline-none focus:border-[#5FCDD9]/50 transition-all"
-                (input)="formatRingNumberInput($event)"
-                (keyup.enter)="searchUser()"
-                />
+            <input [(ngModel)]="searchQuery" type="text" placeholder="XXXX-XXXX"
+                    class="flex-1 px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 outline-none focus:border-[#5FCDD9]/50 transition-all text-base"
+                    (keyup.enter)="searchUser()"/>
             <button (click)="searchUser()" [disabled]="isSearching()"
                     class="px-6 py-3 bg-linear-to-r from-[#5FCDD9] to-[#04BF9D] rounded-xl text-white font-medium hover:shadow-lg transition-all disabled:opacity-50 text-base">
                 @if (isSearching()) {
