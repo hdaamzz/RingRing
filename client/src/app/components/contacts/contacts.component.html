@@ -95,10 +95,6 @@
                     [ngClass]="activeTab() === 'favorites' ? 'flex-1 px-4 py-3 rounded-xl border border-transparent transition-all font-medium bg-linear-to-r from-[#5FCDD9]/20 to-[#04BF9D]/20 text-white' : 'flex-1 px-4 py-3 rounded-xl border border-transparent transition-all font-medium text-gray-400'">
                     ⭐ Favorites ({{ favoriteContacts().length }})
                 </button>
-                <button (click)="setActiveTab('recent')"
-                    [ngClass]="activeTab() === 'recent' ? 'flex-1 px-4 py-3 rounded-xl border border-transparent transition-all font-medium bg-linear-to-r from-[#5FCDD9]/20 to-[#04BF9D]/20 text-white' : 'flex-1 px-4 py-3 rounded-xl border border-transparent transition-all font-medium text-gray-400'">
-                    🕒 Recent
-                </button>
             </div>
         </div>
 
@@ -207,14 +203,6 @@
 
                 <!-- Action Buttons -->
                 <div class="flex gap-2">
-                    <button (click)="startCall(contact)"
-                        class="flex-1 px-4 py-2.5 bg-linear-to-r from-[#5FCDD9] to-[#04BF9D] rounded-xl text-white font-medium hover:shadow-lg hover:shadow-[#5FCDD9]/30 transition-all flex items-center justify-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                        </svg>
-                        Call
-                    </button>
                     <button (click)="deleteContact(contact)"
                         class="px-4 py-2.5 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 hover:bg-red-500/20 transition-all"
                         title="Remove contact">
@@ -234,89 +222,94 @@
 
     <!-- Add Contact Modal -->
     @if (showAddModal()) {
-    <div class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+    <div class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-2 sm:p-4"
         (click)="closeAddModal()">
-        <div class="backdrop-blur-3xl bg-[#172026]/95 rounded-3xl border border-white/10 p-8 max-w-md w-full"
+        <div class="backdrop-blur-3xl bg-[#172026]/95 rounded-3xl border border-white/10 p-4 sm:p-8 max-w-sm w-full"
             (click)="$event.stopPropagation()">
-            <!-- Modal Header -->
-            <div class="flex items-center justify-between mb-6">
-                <h2 class="text-2xl font-bold text-white">Add Contact</h2>
-                <button (click)="closeAddModal()"
+        <!-- Modal Header -->
+        <div class="flex items-center justify-between mb-4 sm:mb-6">
+            <h2 class="text-xl sm:text-2xl font-bold text-white">Add Contact</h2>
+            <button (click)="closeAddModal()"
                     class="p-2 hover:bg-white/5 rounded-lg transition-all text-gray-400 hover:text-white">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-            </div>
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+            </button>
+        </div>
 
-            <!-- Search Input -->
-            <div class="mb-6">
-                <label class="block text-gray-400 text-sm mb-2">Ring Number</label>
-                <div class="flex gap-2">
-                    <input [(ngModel)]="searchQuery" type="text" placeholder="XXXX-XXXX"
-                        class="flex-1 px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 outline-none focus:border-[#5FCDD9]/50 transition-all"
-                        (keyup.enter)="searchUser()">
-                    <button (click)="searchUser()" [disabled]="isSearching()"
-                        class="px-6 py-3 bg-linear-to-r from-[#5FCDD9] to-[#04BF9D] rounded-xl text-white font-medium hover:shadow-lg transition-all disabled:opacity-50">
-                        @if (isSearching()) {
-                        <svg class="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
-                            </circle>
-                            <path class="opacity-75" fill="currentColor"
-                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-                            </path>
-                        </svg>
-                        } @else {
-                        Search
-                        }
-                    </button>
-                </div>
-                <p class="text-gray-500 text-xs mt-2">Enter the Ring Number of the person you want to add</p>
-            </div>
-
-            <!-- Search Result -->
-            @if (searchResult()) {
-            <div class="p-6 bg-white/5 rounded-2xl border border-white/10">
-                <div class="flex items-center gap-4 mb-4">
-                    @if (searchResult()!.picture) {
-                    <img [src]="searchResult()!.picture" [alt]="searchResult()!.name"
-                        class="w-16 h-16 rounded-full ring-2 ring-[#5FCDD9]/50">
-                    } @else {
-                    <div
-                        class="w-16 h-16 rounded-full bg-linear-to-r from-[#5FCDD9] to-[#04BF9D] flex items-center justify-center ring-2 ring-[#5FCDD9]/50">
-                        <span class="text-2xl font-bold text-white">{{ searchResult()!.name[0].toUpperCase() }}</span>
-                    </div>
-                    }
-                    <div class="flex-1">
-                        <h3 class="text-white font-semibold">{{ searchResult()!.name }}</h3>
-                        <p class="text-gray-400 text-sm">{{ searchResult()!.email }}</p>
-                        <p class="text-[#5FCDD9] text-sm font-mono">{{ searchResult()!.ringNumber }}</p>
-                    </div>
-                </div>
-
-                @if (searchResult()!.isContact) {
-                <div class="p-4 bg-yellow-500/10 rounded-xl border border-yellow-500/20">
-                    <p class="text-yellow-400 text-sm flex items-center gap-2">
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd"
-                                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                                clip-rule="evenodd" />
-                        </svg>
-                        Already in your contacts
-                    </p>
-                </div>
+        <!-- Search Input -->
+        <div class="mb-6">
+            <label class="block text-gray-400 text-sm mb-2">Ring Number</label>
+            <div class="flex flex-col sm:flex-row gap-2">
+            <input
+                [(ngModel)]="searchQuery"
+                type="text"
+                placeholder="XXXX-XXXX"
+                maxlength="9"
+                class="flex-1 px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 outline-none focus:border-[#5FCDD9]/50 transition-all"
+                (input)="formatRingNumberInput($event)"
+                (keyup.enter)="searchUser()"
+                />
+            <button (click)="searchUser()" [disabled]="isSearching()"
+                    class="px-6 py-3 bg-linear-to-r from-[#5FCDD9] to-[#04BF9D] rounded-xl text-white font-medium hover:shadow-lg transition-all disabled:opacity-50 text-base">
+                @if (isSearching()) {
+                <svg class="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                    <path class="opacity-75" fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+                </svg>
                 } @else {
-                <button (click)="addContact(searchResult()!.ringNumber)"
-                    class="w-full px-6 py-3 bg-linear-to-r from-[#5FCDD9] to-[#04BF9D] rounded-xl text-white font-medium hover:shadow-lg transition-all">
-                    Add to Contacts
-                </button>
+                Search
                 }
+            </button>
             </div>
+            <p class="text-gray-500 text-xs mt-2">Enter the Ring Number of the person you want to add</p>
+        </div>
+
+        <!-- Search Result -->
+        @if (searchResult()) {
+            <div class="p-4 sm:p-6 bg-white/5 rounded-2xl border border-white/10">
+            <div class="flex flex-col sm:flex-row items-center gap-4 mb-4">
+                @if (searchResult()!.picture) {
+                <img [src]="searchResult()!.picture" [alt]="searchResult()!.name"
+                    class="w-16 h-16 rounded-full ring-2 ring-[#5FCDD9]/50 mx-auto sm:mx-0"/>
+                } @else {
+                <div
+                    class="w-16 h-16 rounded-full bg-linear-to-r from-[#5FCDD9] to-[#04BF9D] flex items-center justify-center ring-2 ring-[#5FCDD9]/50 mx-auto sm:mx-0">
+                    <span class="text-2xl font-bold text-white">{{ searchResult()!.name[0].toUpperCase() }}</span>
+                </div>
+                }
+                <div class="flex-1 text-center sm:text-left">
+                <h3 class="text-white font-semibold text-lg sm:text-xl">{{ searchResult()!.name }}</h3>
+                <p class="text-gray-400 text-sm">{{ searchResult()!.email }}</p>
+                <p class="text-[#5FCDD9] text-sm font-mono">{{ searchResult()!.ringNumber }}</p>
+                </div>
+            </div>
+
+            @if (searchResult()!.isContact) {
+                <div class="p-3 sm:p-4 bg-yellow-500/10 rounded-xl border border-yellow-500/20 text-center">
+                <p class="text-yellow-400 text-sm flex items-center gap-2 justify-center">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd"
+                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                            clip-rule="evenodd"/>
+                    </svg>
+                    Already in your contacts
+                </p>
+                </div>
+            } @else {
+                <button (click)="addContact(searchResult()!.ringNumber)"
+                        class="w-full px-6 py-3 bg-linear-to-r from-[#5FCDD9] to-[#04BF9D] rounded-xl text-white font-medium hover:shadow-lg transition-all text-base mt-2">
+                Add to Contacts
+                </button>
             }
+            </div>
+        }
         </div>
     </div>
     }
+
 
     @if (showDeleteModal()) {
     <div class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in"

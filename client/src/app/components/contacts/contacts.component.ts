@@ -157,6 +157,14 @@ export class ContactsComponent implements OnInit {
   //     }
   //   });
   // }
+  formatRingNumberInput(event: any) {
+    let value = event.target.value.replace(/[^0-9]/g, '');
+    if (value.length > 4) {
+      value = value.slice(0, 4) + '-' + value.slice(4, 8);
+    }
+    event.target.value = value;
+    this.searchQuery = value;
+  }
   deleteContact(contact: Contact): void {
     this.contactToDelete.set(contact);
     this.showDeleteModal.set(true);
