@@ -206,5 +206,6 @@ export class ProfileComponent {
 
   logout(): void {
     this.authService.logout();
+    this.router.navigate(['/']);;
   }
 }

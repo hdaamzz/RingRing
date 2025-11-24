@@ -14,54 +14,47 @@ export class ContactService {
 
   searchUser(ringNumber: string): Observable<{ user: SearchUserResult }> {
     return this.http.get<{ user: SearchUserResult }>(
-      `${this.api}/api/contacts/search?ringNumber=${ringNumber}`,
-      { withCredentials: true }
+      `${this.api}/api/contacts/search?ringNumber=${ringNumber}`
     );
   }
 
   getContacts(): Observable<{ contacts: Contact[] }> {
     return this.http.get<{ contacts: Contact[] }>(
-      `${this.api}/api/contacts`,
-      { withCredentials: true }
+      `${this.api}/api/contacts`
     );
   }
 
   addContact(ringNumber: string): Observable<{ message: string; contact: Contact }> {
     return this.http.post<{ message: string; contact: Contact }>(
       `${this.api}/api/contacts`,
-      { ringNumber },
-      { withCredentials: true }
+      { ringNumber }
     );
   }
 
   updateContact(contactId: string, data: Partial<Contact>): Observable<{ message: string; contact: Contact }> {
     return this.http.put<{ message: string; contact: Contact }>(
       `${this.api}/api/contacts/${contactId}`,
-      data,
-      { withCredentials: true }
+      data
     );
   }
 
   deleteContact(contactId: string): Observable<{ message: string }> {
     return this.http.delete<{ message: string }>(
-      `${this.api}/api/contacts/${contactId}`,
-      { withCredentials: true }
+      `${this.api}/api/contacts/${contactId}`
     );
   }
 
   toggleFavorite(contactId: string): Observable<{ message: string; contact: Contact }> {
     return this.http.patch<{ message: string; contact: Contact }>(
       `${this.api}/api/contacts/${contactId}/favorite`,
-      {},
-      { withCredentials: true }
+      {}
     );
   }
 
   blockContact(contactId: string): Observable<{ message: string }> {
     return this.http.patch<{ message: string }>(
       `${this.api}/api/contacts/${contactId}/block`,
-      {},
-      { withCredentials: true }
+      {}
     );
   }
 }
