@@ -14,8 +14,7 @@ export class CallService {
 
     getCallHistory(page: number = 1, limit: number = 20): Observable<CallHistoryResponse> {
       return this.http.get<CallHistoryResponse>(
-        `${this.api}/api/calls/history?page=${page}&limit=${limit}`,
-        { withCredentials: true }
+        `${this.api}/api/calls/history?page=${page}&limit=${limit}`
       );
     }
 }

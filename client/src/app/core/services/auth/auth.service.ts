@@ -15,10 +15,12 @@ export class AuthService {
 
   private userSignal = signal<UserProfile | null>(null);
   private tokenSignal = signal<string | null>(null);
+  private loadingSignal = signal<boolean>(false); // Add loading state
 
   public currentUser = this.userSignal.asReadonly();
   public isAuthenticated = computed(() => this.currentUser() !== null);
-  private api=environment.api_url
+  public isLoading = this.loadingSignal.asReadonly(); // Expose loading state
+  private api = environment.api_url;
 
   constructor() {
     this.loadFromStorage(); 
@@ -73,6 +75,8 @@ export class AuthService {
   }
 
   async loginWithGoogle() {
+    this.loadingSignal.set(true);
+    
     try {
       const result = await signInWithPopup(auth, googleProvider);
       const idToken = await result.user.getIdToken();
@@ -87,31 +91,38 @@ export class AuthService {
             if (res.user.picture && res.user.picture.startsWith('/uploads')) {
               res.user.picture = `${environment.api_url}${res.user.picture}`;
             }
-            console.log('Login successful:', res.user,res.token);
+            console.log('Login successful:', res.user, res.token);
             this.setUser(res.user, res.token);
+            this.loadingSignal.set(false);
             this.router.navigate(['/']);
           },
           error: (err) => {
             console.error('Backend login failed', err);
+            this.loadingSignal.set(false);
           }
         });
     } catch (error) {
       console.error('Google popup failed', error);
+      this.loadingSignal.set(false);
     }
   }
 
   logout() {
+    this.loadingSignal.set(true);
+    
     signOut(auth).then(() => {
       this.http
         .post(`${this.api}/api/auth/logout`, {})
         .subscribe({
           next: () => {
             this.clearUser();
+            this.loadingSignal.set(false);
             this.router.navigate(['/']);
           },
           error: (err) => {
             console.error('Logout failed', err);
             this.clearUser();
+            this.loadingSignal.set(false);
             this.router.navigate(['/']);
           }
         });

@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit, computed } from '@angular/core';
 import { AuthService } from '../../core/services/auth/auth.service';
-import { Router, RouterLink } from "@angular/router";
+import { ToastService } from '../../core/services/toast/toast.service';
+import { Router } from "@angular/router";
 
 @Component({
   selector: 'app-landing',
@@ -11,10 +12,12 @@ import { Router, RouterLink } from "@angular/router";
 })
 export class LandingComponent implements OnInit {
   protected authService = inject(AuthService);
-  protected route = inject(Router)
+  protected toastService = inject(ToastService);
+  protected route = inject(Router);
 
   protected isAuthenticated = this.authService.isAuthenticated;
   protected currentUser = this.authService.currentUser;
+  protected isLoading = this.authService.isLoading;
   
   protected displayName = computed(() => {
     const user = this.currentUser();
@@ -26,7 +29,12 @@ export class LandingComponent implements OnInit {
   googleLogin = () => this.authService.loginWithGoogle();
   
   handleLogout = () => this.authService.logout();
+  
   toProfile() {
-    this.route.navigate(['/profile'])
+    if (!this.isAuthenticated()) {
+      this.toastService.warning('Please login first to continue');
+      return;
+    }
+    this.route.navigate(['/profile']);
   }
 }
