@@ -1,17 +1,31 @@
 @keyframes float {
-      0%, 100% { transform: translate(0, 0); }
-      50% { transform: translate(50px, 50px); }
-    }
+  0%, 100% {
+    transform: translate(0, 0);
+  }
+  33% {
+    transform: translate(30px, -50px);
+  }
+  66% {
+    transform: translate(-20px, 20px);
+  }
+}
 
-    @keyframes float-delayed {
-      0%, 100% { transform: translate(0, 0); }
-      50% { transform: translate(-30px, -30px); }
-    }
+@keyframes float-delayed {
+  0%, 100% {
+    transform: translate(0, 0);
+  }
+  33% {
+    transform: translate(-40px, 30px);
+  }
+  66% {
+    transform: translate(25px, -25px);
+  }
+}
 
-    .animate-float {
-      animation: float 20s ease-in-out infinite;
-    }
+.animate-float {
+  animation: float 20s ease-in-out infinite;
+}
 
-    .animate-float-delayed {
-      animation: float-delayed 25s ease-in-out infinite;
-    }
+.animate-float-delayed {
+  animation: float-delayed 25s ease-in-out infinite;
+}

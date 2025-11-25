@@ -19,8 +19,31 @@ video {
   pointer-events: none;
 }
 
+/* Smooth transitions */
 * {
   transition-property: transform, opacity;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
+}
+
+/* Better touch targets for mobile */
+button {
+  -webkit-tap-highlight-color: transparent;
+  min-width: 48px;
+  min-height: 48px;
+}
+
+/* Prevent text selection during interactions */
+.touch-manipulation {
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Optimize video rendering on mobile */
+@media (max-width: 768px) {
+  video {
+    object-position: center;
+    image-rendering: -webkit-optimize-contrast;
+  }
 }
