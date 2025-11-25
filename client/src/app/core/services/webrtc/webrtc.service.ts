@@ -36,43 +36,41 @@ export class WebrtcService {
   public currentIncomingCall = this.incomingCall.asReadonly();
 
   private iceServers: RTCIceServer[] = [
-  { urls: 'stun:stun.l.google.com:19302' },
-  { urls: 'stun:stun1.l.google.com:19302' },
-
-  // Free public TURN (Viagenie) - fallback only
-  {
-    urls: 'turn:numb.viagenie.ca',
-    username: 'webrtc@live.com',
-    credential: 'muazkh',
-  },
-  {
-    urls: 'turn:numb.viagenie.ca:3478',
-    username: 'webrtc@live.com',
-    credential: 'muazkh',
-  },
-
-  // Recommended stable TURN (metered.ca)
-  {
-    urls: 'turn:a.relay.metered.ca:80',
-    username: 'openrelayproject',
-    credential: 'openrelayproject',
-  },
-  {
-    urls: 'turn:a.relay.metered.ca:80?transport=tcp',
-    username: 'openrelayproject',
-    credential: 'openrelayproject',
-  },
-  {
-    urls: 'turn:a.relay.metered.ca:443',
-    username: 'openrelayproject',
-    credential: 'openrelayproject',
-  },
-  {
-    urls: 'turns:a.relay.metered.ca:443?transport=tcp',
-    username: 'openrelayproject',
-    credential: 'openrelayproject',
-  },
-];
+    // STUN servers
+    { urls: 'stun:stun.l.google.com:19302' },
+    { urls: 'stun:stun1.l.google.com:19302' },
+    
+    // Primary TURN - Metered (port 80/443)
+    {
+      urls: 'turn:openrelay.metered.ca:80',
+      username: 'openrelayproject',
+      credential: 'openrelayproject',
+    },
+    {
+      urls: 'turn:openrelay.metered.ca:443',
+      username: 'openrelayproject',
+      credential: 'openrelayproject',
+    },
+    
+    // Fallback TURN - FreeTurn.net
+    {
+      urls: 'turn:freeturn.net:3478',
+      username: 'free',
+      credential: 'free',
+    },
+    {
+      urls: 'turn:freeturn.net:5349',
+      username: 'free',
+      credential: 'free',
+    },
+    
+    // Fallback TURN - Numb (if working)
+    {
+      urls: 'turn:numb.viagenie.ca',
+      username: 'webrtc@live.com',
+      credential: 'muazkh',
+    },
+  ];
   constructor() {
     this.setupSocketListeners();
   }
