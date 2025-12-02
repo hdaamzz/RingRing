@@ -13,6 +13,7 @@ export class WebrtcService {
     private localStream: MediaStream | null = null;
     private remoteStream: MediaStream | null = null;
     private pendingIceCandidates: RTCIceCandidateInit[] = [];
+    private qualityMonitorInterval: any = null;
 
     private callState = signal<CallState>({
         callId: null,
@@ -87,7 +88,6 @@ export class WebrtcService {
             await this.handleAnswer(data.answer);
         });
 
-        // FIXED: Buffer ICE candidates until remote description is set
         this.socketService.on('call:ice-candidate', async (data: { candidate: RTCIceCandidateInit }) => {
             if (this.peerConnection && this.peerConnection.remoteDescription) {
                 try {
@@ -124,8 +124,9 @@ export class WebrtcService {
             this.localStream = await navigator.mediaDevices.getUserMedia({
                 video: videoEnabled ? {
                     deviceId: selectedCamera ? { exact: selectedCamera } : undefined,
-                    width: { ideal: 1280 },
-                    height: { ideal: 720 },
+                    width: { ideal: 1280, max: 1280 },
+                    height: { ideal: 720, max: 720 },
+                    frameRate: { ideal: 30, max: 30 },
                     facingMode: 'user'
                 } : false,
                 audio: {
@@ -133,6 +134,8 @@ export class WebrtcService {
                     echoCancellation: settings.audio?.echoCancellation ?? true,
                     noiseSuppression: settings.audio?.noiseSuppression ?? true,
                     autoGainControl: settings.audio?.autoGainControl ?? true,
+                    sampleRate: 48000,
+                    channelCount: 1,
                 },
             });
 
@@ -153,10 +156,8 @@ export class WebrtcService {
         callType: 'video' | 'audio' = 'video'
     ): Promise<void> {
         try {
-            // Initialize local media
             await this.initializeMedia(callType === 'video');
 
-            // Update state
             this.callState.update(state => ({
                 ...state,
                 isInCall: true,
@@ -245,18 +246,34 @@ export class WebrtcService {
     }
 
     private createPeerConnection(receiverId: string): RTCPeerConnection {
-        this.peerConnection = new RTCPeerConnection({ 
+        this.peerConnection = new RTCPeerConnection({
             iceServers: this.iceServers,
-            iceCandidatePoolSize: 10
+            iceCandidatePoolSize: 10,
+            bundlePolicy: 'max-bundle',
+            rtcpMuxPolicy: 'require',
         });
 
         if (this.localStream) {
             this.localStream.getTracks().forEach(track => {
-                this.peerConnection!.addTrack(track, this.localStream!);
+                const sender = this.peerConnection!.addTrack(track, this.localStream!);
+
+                // Apply encoding parameters for low latency
+                if (track.kind === 'video') {
+                    const parameters = sender.getParameters();
+                    if (!parameters.encodings || parameters.encodings.length === 0) {
+                        parameters.encodings = [{}];
+                    }
+
+                    parameters.encodings[0].maxBitrate = 1500000; // 1.5 Mbps
+                    parameters.encodings[0].maxFramerate = 30;
+
+                    sender.setParameters(parameters).catch(err => {
+                        console.warn('Failed to set encoding parameters:', err);
+                    });
+                }
             });
         }
 
-        // FIXED: Handle all ICE candidates including the final null
         this.peerConnection.onicecandidate = (event) => {
             if (event.candidate) {
                 console.log('Sending ICE candidate:', event.candidate.type);
@@ -281,11 +298,9 @@ export class WebrtcService {
                 this.remoteStream.addTrack(event.track);
             }
 
-            // FIXED: Notify subscribers about remote stream update
             this.remoteStreamSubject.next(this.remoteStream);
         };
 
-        // FIXED: Enhanced ICE connection state monitoring
         this.peerConnection.oniceconnectionstatechange = () => {
             const iceState = this.peerConnection?.iceConnectionState;
             console.log('ICE connection state:', iceState);
@@ -315,13 +330,13 @@ export class WebrtcService {
                     ...state,
                     startTime: new Date(),
                 }));
+                this.startQualityMonitoring();
             } else if (connState === 'failed') {
                 console.error('Connection failed completely');
                 this.endCall();
             }
         };
 
-        // Monitor ICE gathering state
         this.peerConnection.onicegatheringstatechange = () => {
             console.log('ICE gathering state:', this.peerConnection?.iceGatheringState);
         };
@@ -329,7 +344,6 @@ export class WebrtcService {
         return this.peerConnection;
     }
 
-    // FIXED: Add buffered ICE candidates after remote description is set
     private async addPendingIceCandidates(): Promise<void> {
         if (this.pendingIceCandidates.length > 0 && this.peerConnection) {
             console.log(`Adding ${this.pendingIceCandidates.length} buffered ICE candidates`);
@@ -347,6 +361,41 @@ export class WebrtcService {
         }
     }
 
+    private preferCodec(sdp: string, type: 'audio' | 'video', codec: string): string {
+        const sdpLines = sdp.split('\r\n');
+        const mLineIndex = sdpLines.findIndex(line => line.startsWith(`m=${type}`));
+
+        if (mLineIndex === -1) return sdp;
+
+        const codecPattern = new RegExp(`a=rtpmap:(\\d+) ${codec}/`, 'i');
+        let codecPayloadType: string | null = null;
+
+        for (let i = mLineIndex + 1; i < sdpLines.length; i++) {
+            const line = sdpLines[i];
+            if (line.startsWith('m=')) break;
+
+            const match = line.match(codecPattern);
+            if (match) {
+                codecPayloadType = match[1];
+                break;
+            }
+        }
+
+        if (!codecPayloadType) return sdp;
+
+        const mLine = sdpLines[mLineIndex];
+        const elements = mLine.split(' ');
+        const codecIndex = elements.indexOf(codecPayloadType);
+
+        if (codecIndex > 3) {
+            elements.splice(codecIndex, 1);
+            elements.splice(3, 0, codecPayloadType);
+            sdpLines[mLineIndex] = elements.join(' ');
+        }
+
+        return sdpLines.join('\r\n');
+    }
+
     private async createOffer(callId: string): Promise<void> {
         const receiverId = this.callState().receiver?.id;
         if (!receiverId) return;
@@ -355,8 +404,15 @@ export class WebrtcService {
 
         const offer = await this.peerConnection!.createOffer({
             offerToReceiveAudio: true,
-            offerToReceiveVideo: true
+            offerToReceiveVideo: true,
         });
+
+        // Prefer H.264 for video and Opus for audio
+        if (offer.sdp) {
+            offer.sdp = this.preferCodec(offer.sdp, 'video', 'H264');
+            offer.sdp = this.preferCodec(offer.sdp, 'audio', 'opus');
+        }
+
         await this.peerConnection!.setLocalDescription(offer);
 
         this.socketService.emit('call:offer', {
@@ -375,11 +431,16 @@ export class WebrtcService {
         this.createPeerConnection(callerId);
 
         await this.peerConnection!.setRemoteDescription(new RTCSessionDescription(offer));
-
-        // FIXED: Add buffered candidates after setting remote description
         await this.addPendingIceCandidates();
 
         const answer = await this.peerConnection!.createAnswer();
+
+        // Prefer codecs in answer as well
+        if (answer.sdp) {
+            answer.sdp = this.preferCodec(answer.sdp, 'video', 'H264');
+            answer.sdp = this.preferCodec(answer.sdp, 'audio', 'opus');
+        }
+
         await this.peerConnection!.setLocalDescription(answer);
 
         this.socketService.emit('call:answer', {
@@ -392,13 +453,10 @@ export class WebrtcService {
     private async handleAnswer(answer: RTCSessionDescriptionInit): Promise<void> {
         if (this.peerConnection) {
             await this.peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
-
-            // FIXED: Add buffered candidates after setting remote description
             await this.addPendingIceCandidates();
         }
     }
 
-    // NEW: ICE restart mechanism for connection recovery
     private async restartIce(): Promise<void> {
         if (!this.peerConnection) return;
 
@@ -423,6 +481,65 @@ export class WebrtcService {
         } catch (error) {
             console.error('ICE restart failed:', error);
             this.endCall();
+        }
+    }
+
+    private startQualityMonitoring(): void {
+        if (this.qualityMonitorInterval) {
+            clearInterval(this.qualityMonitorInterval);
+        }
+
+        this.qualityMonitorInterval = setInterval(async () => {
+            if (!this.peerConnection) return;
+
+            try {
+                const stats = await this.peerConnection.getStats();
+                let packetsLost = 0;
+                let packetsReceived = 0;
+
+                stats.forEach(report => {
+                    if (report.type === 'inbound-rtp' && report.kind === 'video') {
+                        packetsLost = report.packetsLost || 0;
+                        packetsReceived = report.packetsReceived || 0;
+                    }
+                });
+
+                if (packetsReceived > 0) {
+                    const lossRate = (packetsLost / packetsReceived) * 100;
+
+                    if (lossRate > 5) {
+                        console.log(`High packet loss detected: ${lossRate.toFixed(2)}%`);
+                        this.adjustVideoQuality(lossRate);
+                    }
+                }
+            } catch (error) {
+                console.error('Error monitoring quality:', error);
+            }
+        }, 5000);
+    }
+
+    private adjustVideoQuality(lossRate: number): void {
+        const videoSender = this.peerConnection
+            ?.getSenders()
+            .find(sender => sender.track?.kind === 'video');
+
+        if (!videoSender) return;
+
+        const parameters = videoSender.getParameters();
+        if (parameters.encodings && parameters.encodings.length > 0) {
+            const currentBitrate = parameters.encodings[0].maxBitrate || 1500000;
+            
+            // Reduce bitrate by 20% but don't go below 500kbps
+            const newBitrate = Math.max(500000, currentBitrate * 0.8);
+            parameters.encodings[0].maxBitrate = newBitrate;
+
+            videoSender.setParameters(parameters)
+                .then(() => {
+                    console.log(`Video bitrate adjusted to ${(newBitrate / 1000000).toFixed(2)} Mbps`);
+                })
+                .catch(err => {
+                    console.warn('Failed to adjust video quality:', err);
+                });
         }
     }
 
@@ -489,6 +606,12 @@ export class WebrtcService {
             }
         }
 
+        // Stop quality monitoring
+        if (this.qualityMonitorInterval) {
+            clearInterval(this.qualityMonitorInterval);
+            this.qualityMonitorInterval = null;
+        }
+
         if (this.localStream) {
             this.localStream.getTracks().forEach(track => track.stop());
             this.localStream = null;
@@ -504,7 +627,6 @@ export class WebrtcService {
             this.peerConnection = null;
         }
 
-        // FIXED: Clear buffered ICE candidates
         this.pendingIceCandidates = [];
 
         this.callState.set({
