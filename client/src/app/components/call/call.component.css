@@ -11,7 +11,61 @@
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
+/* Remote Video - Full screen with proper aspect ratio */
+.remote-video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  background: #000;
+  max-width: 100vw;
+  max-height: 100vh;
+}
+
+/* Local Video - PiP style */
+.local-video {
+  width: 112px; 
+  height: 80px; 
+  object-fit: cover; 
+  object-position: center;
+  border-radius: 0.75rem; 
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+/* Desktop adjustments */
+@media (min-width: 768px) {
+  .local-video {
+    width: 192px; 
+    height: 144px;
+    border-radius: 1rem;
+  }
+  
+  /* Option: Use cover for desktop if you want to fill screen */
+  .remote-video {
+    object-fit: contain; 
+  }
+}
+
+/* Landscape mobile - use cover to fill screen */
+@media (max-width: 768px) and (orientation: landscape) {
+  .remote-video {
+    object-fit: cover;
+  }
+}
+
+/* Portrait mode - contain shows full video */
+@media (orientation: portrait) {
+  .remote-video {
+    object-fit: contain;
+  }
+}
+
+/* Hide default video controls */
 video::-webkit-media-controls {
+  display: none !important;
+}
+
+video::-webkit-media-controls-enclosure {
   display: none !important;
 }
 
@@ -20,7 +74,7 @@ video {
 }
 
 /* Smooth transitions */
-* {
+.transition-all {
   transition-property: transform, opacity;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
@@ -40,10 +94,24 @@ button {
   -webkit-user-select: none;
 }
 
-/* Optimize video rendering on mobile */
+/* Optimize video rendering */
+video {
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
+
+/* Ensure proper video rendering on mobile */
 @media (max-width: 768px) {
   video {
-    object-position: center;
-    image-rendering: -webkit-optimize-contrast;
+    transform: translateZ(0); 
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
   }
 }
+
+/* Fix for iOS Safari video rendering */
+/* @supports (-webkit-touch-callout: none) {
+  video {
+    -webkit-transform: translate3d(0, 0, 0);
+  }
+} */
