@@ -93,7 +93,7 @@
                         <!-- Mute Button -->
                         <button 
                             (click)="toggleMute()"
-                            [class.bg-white/10]="!callState().isMuted"
+                            [class.bg-white-10]="!callState().isMuted"
                             [class.bg-red-500]="callState().isMuted"
                             class="group p-4 md:p-5 rounded-xl md:rounded-2xl transition-all active:scale-95 touch-manipulation hover:bg-white/20">
                             @if (callState().isMuted) {
@@ -111,7 +111,7 @@
                         <!-- Video Toggle Button -->
                         <button 
                             (click)="toggleVideo()"
-                            [class.bg-white/10]="callState().isVideoEnabled"
+                            [class.bg-white-10]="callState().isVideoEnabled"
                             [class.bg-red-500]="!callState().isVideoEnabled"
                             class="group p-4 md:p-5 rounded-xl md:rounded-2xl transition-all active:scale-95 touch-manipulation hover:bg-white/20">
                             @if (callState().isVideoEnabled) {
