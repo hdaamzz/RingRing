@@ -1,6 +1,6 @@
 export const environment = {
   production: true,
-  api_url:'https://ringringfree.duckdns.org',
+  api_url:'https://api-ringring.hamzathuldilshad.site',
   firebase:{
     apiKey: "AIzaSyAoZP4CvfUe5-cEMmbLaXQbDEzVMb27l4Y",
     authDomain: "ringring-009.firebaseapp.com",
